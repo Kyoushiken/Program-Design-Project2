@@ -48,5 +48,11 @@ public abstract class Entity {
     public int getMaxHp() {
         return maxHp;
     }
-}
 
+
+@Override 
+public String toString() {
+       return name + " (HP : " + hp + "/" + maxHp + ")";
+    }
+
+}

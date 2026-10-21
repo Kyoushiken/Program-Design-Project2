@@ -6,7 +6,7 @@ package com.mycompany.project2.view;
 
 /**
  *
- * @author poloj
+ * @author nicka
  */
 
 import javax.swing.*;

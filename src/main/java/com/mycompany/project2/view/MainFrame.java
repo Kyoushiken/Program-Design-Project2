@@ -6,7 +6,7 @@ package com.mycompany.project2.view;
 
 /**
  *
- * @author poloj
+ * @author nicka
  */
 
 import com.mycompany.project2.controller.GameController;
@@ -26,7 +26,7 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
 
     private final GameController controller = new GameController();
 
-    private final JLabel statusLabel = new JLabel(" ");
+    private final StatsPanel statsPanel = new StatsPanel(controller);
     private final JTextArea logArea = new JTextArea();
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel cardPanel = new JPanel(cardLayout);
@@ -48,8 +48,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
         setLayout(new BorderLayout(10, 10));
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD, 14f));
-        add(statusLabel, BorderLayout.NORTH);
+       
+        add(statsPanel, BorderLayout.NORTH);
 
         logArea.setEditable(false);
         logArea.setLineWrap(true);
@@ -78,14 +78,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
                 logArea.append(evt.getNewValue() + "\n\n");
                 logArea.setCaretPosition(logArea.getDocument().getLength());
             }
-            case GameController.PLAYER_PROPERTY -> updateStatus();
+            case GameController.ERROR_PROPERTY -> JOptionPane.showMessageDialog(this, evt.getNewValue(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void updateStatus() {
-        Player player = controller.getPlayer();
-        if (player != null) {
-            statusLabel.setText(player.toString());
-        }
-    }
 }

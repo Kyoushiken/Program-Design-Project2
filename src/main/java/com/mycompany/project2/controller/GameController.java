@@ -103,7 +103,14 @@ public class GameController {
                 firePlayerChanged();
             }
             case 2 -> {
-                
+                try {
+                    Weapon longSword = weaponDAO.findByName("Long Sword");
+                    player.setWeapon(longSword);
+                    log("You found a Long Sword and equipped it!");
+                    firePlayerChanged();
+                } catch (RuntimeException e){
+                    support.firePropertyChange(ERROR_PROPERTY, null, "Could not retrieve the weapon - database error: " + e.getMessage()); 
+                }
             }
             case 3 -> startFight();
             case 4 -> setState(GameState.TOWN_GATE);
@@ -149,11 +156,17 @@ public class GameController {
     }
 
     private void endGame(String outcome) {
-        resultDAO.save(player.getName(), outcome);
-        log(outcome);
-        setState(GameState.GAME_OVER);
+       try {
+           resultDAO.save(player.getName(), outcome);
+       } catch (RuntimeException e){
+           support.firePropertyChange(ERROR_PROPERTY, null, "Could not save your result - database error: " + e.getMessage());
+    
+       }
+       log(outcome);
+       setState(GameState.GAME_OVER);
     }
-
+    
+    
     private void setState(GameState newState) {
         GameState old = this.state;
         this.state = newState;

@@ -6,7 +6,7 @@ package com.mycompany.project2.dao;
 
 /**
  *
- * @author poloj
+ * @author nicka
  */
 
 import com.mycompany.project2.model.Weapon;

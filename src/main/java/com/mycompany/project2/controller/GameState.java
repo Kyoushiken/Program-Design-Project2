@@ -6,7 +6,7 @@ package com.mycompany.project2.controller;
 
 /**
  *
- * @author poloj
+ * @author nicka
  */
 
 

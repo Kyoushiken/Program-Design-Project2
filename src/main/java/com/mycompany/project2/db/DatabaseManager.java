@@ -6,7 +6,7 @@ package com.mycompany.project2.db;
 
 /**
  *
- * @author poloj
+ * @author nicka
  */
 
 import java.sql.Connection;
