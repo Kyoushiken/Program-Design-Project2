@@ -2,6 +2,7 @@ package com.mycompany.project2.view;
 
 import com.mycompany.project2.controller.GameController;
 import com.mycompany.project2.controller.GameState;
+import com.mycompany.project2.controller.DerbyGameResultDAO;
 import com.mycompany.project2.db.DatabaseManager;
 import com.mycompany.project2.model.Player;
 
@@ -14,9 +15,20 @@ import java.beans.PropertyChangeListener;
 
 
 public class MainFrame extends JFrame implements PropertyChangeListener {
-
+    
+    private static final String RESULTS_CARD = "RESULTS";
+    private static final int GAP = 10;
+    private static final Dimension WINDOW_SIZE = new Dimension(640, 640);
+    private static final Dimension LOG_SIZE = new Dimension(560, 180);
+    
+    static {
+        Theme.install();
+    }
+    
     private final GameController controller = new GameController();
 
+    private final ScenePanel scenePanel = new ScenePanel();
+    
     private final JLabel statusLabel = new JLabel(" ");
     private final JTextArea logArea = new JTextArea();
     private final CardLayout cardLayout = new CardLayout();
