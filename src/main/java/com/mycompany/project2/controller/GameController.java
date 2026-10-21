@@ -1,4 +1,14 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.project2.controller;
+
+/**
+ *
+ * @author nicka
+ */
+
 
 import com.mycompany.project2.dao.DerbyGameResultDAO;
 import com.mycompany.project2.dao.DerbyWeaponDAO;
@@ -17,6 +27,7 @@ public class GameController {
     public static final String STATE_PROPERTY = "state";
     public static final String LOG_PROPERTY = "log";
     public static final String PLAYER_PROPERTY = "player";
+    public static final String ERROR_PROPERTY = "error";
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private final WeaponDAO weaponDAO = new DerbyWeaponDAO();
@@ -24,7 +35,7 @@ public class GameController {
 
     private GameState state = GameState.START;
     private Player player;
-    private Monster monster;
+    Monster monster;
     private boolean hasRing = false;
 
     public void addListener(PropertyChangeListener listener) {
@@ -45,7 +56,14 @@ public class GameController {
 
     /** Call once, when the player submits their name on the start screen. */
     public void startGame(String playerName) {
-        Weapon startingWeapon = weaponDAO.findByName("Knife");
+        Weapon startingWeapon;
+        try {
+            startingWeapon = weaponDAO.findByName("Knife");
+        } catch (RuntimeException e){
+            support.firePropertyChange(ERROR_PROPERTY, null, "Could not start a new game - database error: " + e.getMessage());
+            
+            return;
+        }
         player = new Player(playerName, 10, startingWeapon);
         log("Welcome, " + playerName + "! " + player);
         setState(GameState.TOWN_GATE);
@@ -85,10 +103,14 @@ public class GameController {
                 firePlayerChanged();
             }
             case 2 -> {
-                Weapon longSword = weaponDAO.findByName("Long Sword");
-                player.setWeapon(longSword);
-                log("You found a Long Sword and equipped it!");
-                firePlayerChanged();
+                try {
+                    Weapon longSword = weaponDAO.findByName("Long Sword");
+                    player.setWeapon(longSword);
+                    log("You found a Long Sword and equipped it!");
+                    firePlayerChanged();
+                } catch (RuntimeException e){
+                    support.firePropertyChange(ERROR_PROPERTY, null, "Could not retrieve the weapon - database error: " + e.getMessage()); 
+                }
             }
             case 3 -> startFight();
             case 4 -> setState(GameState.TOWN_GATE);
@@ -134,11 +156,17 @@ public class GameController {
     }
 
     private void endGame(String outcome) {
-        resultDAO.save(player.getName(), outcome);
-        log(outcome);
-        setState(GameState.GAME_OVER);
+       try {
+           resultDAO.save(player.getName(), outcome);
+       } catch (RuntimeException e){
+           support.firePropertyChange(ERROR_PROPERTY, null, "Could not save your result - database error: " + e.getMessage());
+    
+       }
+       log(outcome);
+       setState(GameState.GAME_OVER);
     }
-
+    
+    
     private void setState(GameState newState) {
         GameState old = this.state;
         this.state = newState;

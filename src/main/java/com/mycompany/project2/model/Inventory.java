@@ -38,4 +38,8 @@ public class Inventory {
             System.out.println(" - " + item);
         }
     }
+    
+    public java.util.List<String> getItems(){
+        return items;
+    }
 }

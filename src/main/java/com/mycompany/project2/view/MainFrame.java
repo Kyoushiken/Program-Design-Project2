@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.project2.view;
+
+/**
+ *
+ * @author nicka
+ */
 
 import com.mycompany.project2.controller.GameController;
 import com.mycompany.project2.controller.GameState;
@@ -51,8 +60,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
         setLayout(new BorderLayout(10, 10));
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD, 14f));
-        add(statusLabel, BorderLayout.NORTH);
+       
+        add(statsPanel, BorderLayout.NORTH);
 
         logArea.setEditable(false);
         logArea.setLineWrap(true);
@@ -81,14 +90,8 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
                 logArea.append(evt.getNewValue() + "\n\n");
                 logArea.setCaretPosition(logArea.getDocument().getLength());
             }
-            case GameController.PLAYER_PROPERTY -> updateStatus();
+            case GameController.ERROR_PROPERTY -> JOptionPane.showMessageDialog(this, evt.getNewValue(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void updateStatus() {
-        Player player = controller.getPlayer();
-        if (player != null) {
-            statusLabel.setText(player.toString());
-        }
-    }
 }
