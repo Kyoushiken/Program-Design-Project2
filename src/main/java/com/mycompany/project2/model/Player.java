@@ -1,42 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.project2.model;
 
-import com.mycompany.project2.model.Entity;
 
-/**
- *
- * @author poloj
- */
 public class Player extends Entity {
-     
+
     private Weapon weapon;
-    private Inventory inventory;
-    
+    private final Inventory inventory = new Inventory();
+
     public Player(String name, int hp, Weapon weapon) {
         super(name, hp);
         this.weapon = weapon;
-        this.inventory = new Inventory();
         inventory.addItem(weapon.getName());
-        
     }
-    
-    @Override //POLYMORPHISM
+
+    /**
+     * Polymorphism
+     */
+    @Override
     public int attack() {
-        return weapon.rollDamage();   
+        return weapon.rollDamage();
     }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
     
-    public Weapon getWeapon(){return weapon;}
-    
-    public void setWeapon(Weapon weapon){
+    public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
-        inventory.addItem(weapon.getName());
+        if (!inventory.hasItem(weapon.getName())) {
+            inventory.addItem(weapon.getName());
+        }
     }
-    
-    public Inventory getInventory(){
+
+    public Inventory getInventory() {
         return inventory;
     }
-    
 }

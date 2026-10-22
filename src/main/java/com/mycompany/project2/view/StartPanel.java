@@ -1,37 +1,37 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.project2.view;
 
-/**
- *
- * @author nicka
- */
-
 import com.mycompany.project2.controller.GameController;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import javax.swing.*;
-import java.awt.*;
 
 public class StartPanel extends JPanel {
 
+    private static final int MAX_NAME_LENGTH = 20; 
+
     public StartPanel(GameController controller) {
-        setLayout(new FlowLayout());
+        setOpaque(false);
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
         JTextField nameField = new JTextField(15);
-        JButton startButton = new JButton("Start Adventure");
+        nameField.setFont(GameStyle.FONT);
+        JButton startButton = GameStyle.button("Start Adventure");
 
         startButton.addActionListener(e -> {
             String name = nameField.getText().trim();
-            if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a name.");
+            if (name.isEmpty() || name.length() > MAX_NAME_LENGTH) {
+                JOptionPane.showMessageDialog(this,
+                        "Please enter a name of 1 to " + MAX_NAME_LENGTH + " characters.");
                 return;
             }
             controller.startGame(name);
         });
+        nameField.addActionListener(e -> startButton.doClick()); // Enter also starts
 
-        add(new JLabel("Enter your name:"));
+        add(GameStyle.label("Your name:"));
         add(nameField);
         add(startButton);
     }

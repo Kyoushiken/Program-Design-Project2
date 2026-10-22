@@ -1,45 +1,53 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.project2.controller;
-
-/**
- *
- * @author nicka
- */
-
 
 import com.mycompany.project2.dao.DerbyGameResultDAO;
 import com.mycompany.project2.dao.DerbyWeaponDAO;
 import com.mycompany.project2.dao.GameResultDAO;
 import com.mycompany.project2.dao.WeaponDAO;
+import com.mycompany.project2.db.DatabaseManager;
+import com.mycompany.project2.model.GameResult;
 import com.mycompany.project2.model.Monster;
+import com.mycompany.project2.model.MonsterFactory;
 import com.mycompany.project2.model.Player;
 import com.mycompany.project2.model.Weapon;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class GameController {
 
-    public static final String STATE_PROPERTY = "state";
-    public static final String LOG_PROPERTY = "log";
-    public static final String PLAYER_PROPERTY = "player";
-    public static final String ERROR_PROPERTY = "error";
+    private static final int START_HP = 10;
+    private static final String SILVER_RING = "Silver Ring";
+    private static final String LONG_SWORD = "Long Sword";
 
-    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private final List<GameListener> listeners = new ArrayList<>();
     private final WeaponDAO weaponDAO = new DerbyWeaponDAO();
     private final GameResultDAO resultDAO = new DerbyGameResultDAO();
 
     private GameState state = GameState.START;
     private Player player;
-    Monster monster;
-    private boolean hasRing = false;
+    private Monster monster;
 
-    public void addListener(PropertyChangeListener listener) {
-        support.addPropertyChangeListener(listener);
+    public void addListener(GameListener listener) {
+        listeners.add(listener);
+    }
+
+    private void setState(GameState newState) {
+        state = newState;
+        listeners.forEach(l -> l.stateChanged(newState));
+    }
+
+    private void log(String message) {
+        listeners.forEach(l -> l.messageLogged(message));
+    }
+
+    private void notifyPlayerChanged() {
+        listeners.forEach(l -> l.playerChanged(player));
+    }
+
+    private void reportError(String message) {
+        listeners.forEach(l -> l.errorOccurred(message));
     }
 
     public GameState getState() {
@@ -49,135 +57,180 @@ public class GameController {
     public Player getPlayer() {
         return player;
     }
-
-    public Monster getMonster() {
-        return monster;
-    }
-
-    /** Call once, when the player submits their name on the start screen. */
+    
     public void startGame(String playerName) {
-        Weapon startingWeapon;
         try {
-            startingWeapon = weaponDAO.findByName("Knife");
-        } catch (RuntimeException e){
-            support.firePropertyChange(ERROR_PROPERTY, null, "Could not start a new game - database error: " + e.getMessage());
-            
+            player = new Player(playerName, START_HP, loadWeapon("Knife"));
+        } catch (RuntimeException e) {
+            reportError("Could not start a new game - database error: " + e.getMessage());
             return;
         }
-        player = new Player(playerName, 10, startingWeapon);
-        log("Welcome, " + playerName + "! " + player);
+        log("Welcome, " + playerName + ". You stand before the sealed gates of the town.");
         setState(GameState.TOWN_GATE);
     }
 
-    /** choice: 1 = talk to guard, 2 = attack guard, 3 = leave town, other = quit */
-    public void handleTownGateChoice(int choice) {
-        switch (choice) {
-            case 1 -> {
-                if (hasRing) {
-                    log("Guard: You defeated the monster! Welcome to our town!");
-                    endGame("WON - entered the town");
-                } else {
-                    log("Guard: Sorry, strangers cannot enter.");
-                    // stays in TOWN_GATE — no state change needed
-                }
-            }
-            case 2 -> {
-                player.takeDamage(1);
-                log("Guard: Don't be foolish! You take 1 damage.\n" + player);
-                firePlayerChanged();
-                if (!player.isAlive()) {
-                    endGame("LOSE - defeated by the guard");
-                }
-            }
-            case 3 -> setState(GameState.CROSSROAD);
-            default -> endGame("QUIT at the town gate");
+    public void restart() {
+        player = null;
+        monster = null;
+        setState(GameState.START);
+    }
+
+    
+    public void quitGame() {
+        endGame("QUIT at " + state.getPlace());
+    }
+
+    
+    private void endGame(String outcome) {
+        try {
+            resultDAO.save(player.getName(), outcome);
+        } catch (RuntimeException e) {
+            reportError("Could not save your result - database error: " + e.getMessage());
+        }
+        log(outcome);
+        setState(GameState.GAME_OVER);
+    }
+
+    // ---------- Town gate ----------
+    public void talkToGuard() {
+        if (player.getInventory().hasItem(SILVER_RING)) {
+            log("Guard: You defeated the monster! Welcome to our town!");
+            endGame("WON - entered the town");
+        } else {
+            log("Guard: Sorry, strangers cannot enter.");
         }
     }
 
-    /** choice: 1 = river (heal), 2 = forest (find sword), 3 = fight, 4 = back to town, other = quit */
-    public void handleCrossroadChoice(int choice) {
-        switch (choice) {
-            case 1 -> {
-                player.heal(1);
-                log("You drank from the river and feel refreshed. " + player);
-                firePlayerChanged();
-            }
-            case 2 -> {
-                try {
-                    Weapon longSword = weaponDAO.findByName("Long Sword");
-                    player.setWeapon(longSword);
-                    log("You found a Long Sword and equipped it!");
-                    firePlayerChanged();
-                } catch (RuntimeException e){
-                    support.firePropertyChange(ERROR_PROPERTY, null, "Could not retrieve the weapon - database error: " + e.getMessage()); 
-                }
-            }
-            case 3 -> startFight();
-            case 4 -> setState(GameState.TOWN_GATE);
-            default -> endGame("QUIT at the crossroad");
+    public void attackGuard() {
+        player.takeDamage(1);
+        log("Guard: Don't be foolish! You take 1 damage. " + player);
+        notifyPlayerChanged();
+        if (!player.isAlive()) {
+            endGame("LOSE - defeated by the guard");
         }
     }
 
-    private void startFight() {
-        monster = new Monster("Goblin", 15, 1, 4);
+    public void leaveTown() {
+        log("You leave the town and follow the road to a crossroad.");
+        setState(GameState.CROSSROAD);
+    }
+
+    // ---------- Crossroad ----------
+    public void goNorth() {
+        log("You follow the path north to the river.");
+        setState(GameState.RIVER);
+    }
+
+    public void goEast() {
+        log("You walk east into the forest.");
+        setState(GameState.FOREST);
+    }
+
+    public void goWest() {
+        startFightWith(MonsterFactory.createRandom());
+    }
+
+    public void goSouth() {
+        log("You walk south, back to the town gate.");
+        setState(GameState.TOWN_GATE);
+    }
+
+    /**
+     * Used by the river and the forest to go back.
+     */
+    public void backToCrossroad() {
+        log("You return to the crossroad.");
+        setState(GameState.CROSSROAD);
+    }
+
+    // ---------- River and forest ----------
+    public void drinkWater() {
+        player.heal(1);
+        log("You drink the cool water and feel refreshed.");
+        notifyPlayerChanged();
+    }
+
+    public void searchForest() {
+        if (player.getInventory().hasItem(LONG_SWORD)) {
+            log("You search the forest again but find nothing new.");
+            return;
+        }
+        try {
+            player.setWeapon(loadWeapon(LONG_SWORD));
+            log("You found a Long Sword and equipped it!");
+            notifyPlayerChanged();
+        } catch (RuntimeException e) {
+            reportError("Could not get the weapon - database error: " + e.getMessage());
+        }
+    }
+
+    // ---------- Fight ----------
+    void startFightWith(Monster newMonster) {
+        monster = newMonster;
         log("A wild " + monster.getName() + " appears!");
         setState(GameState.FIGHT);
     }
 
-    /** choice: 1 = attack, 2 = run */
-    public void handleFightChoice(int choice) {
-        if (choice == 2) {
-            log("You ran away from the fight!");
-            setState(GameState.CROSSROAD);
-            return;
-        }
-
+    public void attackMonster() {
         int damageDealt = player.attack();
         monster.takeDamage(damageDealt);
-        log("You hit the " + monster.getName() + " for " + damageDealt + " damage.");
+        log("You hit the " + monster.getName() + " for " + damageDealt + " damage. " + monster);
 
         if (!monster.isAlive()) {
-            log("You defeated the " + monster.getName() + "! It dropped a silver ring!");
-            player.getInventory().addItem("Silver Ring");
-            hasRing = true;
-            firePlayerChanged();
-            setState(GameState.CROSSROAD);
+            winFight();
             return;
         }
 
         int damageTaken = monster.attack();
         player.takeDamage(damageTaken);
         log("The " + monster.getName() + " hits you for " + damageTaken + " damage.");
-        firePlayerChanged();
+        notifyPlayerChanged();
 
         if (!player.isAlive()) {
             endGame("LOSE - killed by a " + monster.getName());
         }
     }
 
-    private void endGame(String outcome) {
-       try {
-           resultDAO.save(player.getName(), outcome);
-       } catch (RuntimeException e){
-           support.firePropertyChange(ERROR_PROPERTY, null, "Could not save your result - database error: " + e.getMessage());
-    
-       }
-       log(outcome);
-       setState(GameState.GAME_OVER);
-    }
-    
-    
-    private void setState(GameState newState) {
-        GameState old = this.state;
-        this.state = newState;
-        support.firePropertyChange(STATE_PROPERTY, old, newState);
+    public void runAway() {
+        log("You ran away from the fight!");
+        setState(GameState.CROSSROAD);
     }
 
-    private void log(String message) {
-        support.firePropertyChange(LOG_PROPERTY, null, message);
+    private void winFight() {
+        log("You defeated the " + monster.getName() + "! It dropped a silver ring!");
+        if (!player.getInventory().hasItem(SILVER_RING)) {
+            player.getInventory().addItem(SILVER_RING);
+        }
+        notifyPlayerChanged();
+        setState(GameState.CROSSROAD);
     }
 
-    private void firePlayerChanged() {
-        support.firePropertyChange(PLAYER_PROPERTY, null, player);
+    // ---------- Results screen  ----------
+    public List<GameResult> getAllResults() {
+        return resultDAO.findAll();
+    }
+
+    public List<GameResult> getResultsFor(String playerName) {
+        return resultDAO.findByPlayer(playerName);
+    }
+
+    public Map<String, Integer> getOutcomeCounts() {
+        return resultDAO.countByOutcome();
+    }
+
+    public void clearResults() {
+        resultDAO.deleteAll();
+    }
+
+    public void shutdown() {
+        DatabaseManager.shutdown();
+    }
+
+    private Weapon loadWeapon(String name) {
+        Weapon weapon = weaponDAO.findByName(name);
+        if (weapon == null) {
+            throw new IllegalStateException("Weapon '" + name + "' is not in the database.");
+        }
+        return weapon;
     }
 }

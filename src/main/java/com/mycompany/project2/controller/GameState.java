@@ -1,19 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.project2.controller;
 
-/**
- *
- * @author nicka
- */
-
-
 public enum GameState {
-    START,
-    TOWN_GATE,
-    CROSSROAD,
-    FIGHT,
-    GAME_OVER
+    START("the start"),
+    TOWN_GATE("the town gate"),
+    CROSSROAD("the crossroad"),
+    RIVER("the river"),
+    FOREST("the forest"),
+    FIGHT("a fight"),
+    GAME_OVER("the end");
+
+    private final String place;
+
+    GameState(String place) {
+        this.place = place;
+    }
+
+    public String getPlace() {
+        return place;
+    }
 }

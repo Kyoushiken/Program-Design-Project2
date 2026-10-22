@@ -1,22 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.project2.view;
 
-/**
- *
- * @author nicka
- */
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
-import javax.swing.*;
-import java.awt.*;
 
 public class GameOverPanel extends JPanel {
 
-    public GameOverPanel() {
-        setLayout(new FlowLayout());
-        JLabel label = new JLabel("Game Over — see the log above for your result. Close the window to exit.");
-        add(label);
+    public GameOverPanel(Runnable onPlayAgain, Runnable onResults, Runnable onExit) {
+        setOpaque(false);
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+
+        JButton playAgain = GameStyle.button("Play again");
+        JButton results = GameStyle.button("Results");
+        JButton exit = GameStyle.button("Exit");
+
+        playAgain.addActionListener(e -> onPlayAgain.run());
+        results.addActionListener(e -> onResults.run());
+        exit.addActionListener(e -> onExit.run());
+
+        add(playAgain);
+        add(results);
+        add(exit);
     }
 }
