@@ -1,8 +1,16 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.project2.model;
 
 import java.time.LocalDateTime;
 
-
+/**
+ *
+ * @author poloj
+ * @author nicka
+ */
 public class GameResult {
 
     private final int id;
@@ -33,6 +41,7 @@ public class GameResult {
         return playedAt;
     }
 
+    // Returns the result as a readable string
     @Override
     public String toString() {
         return playerName + " | " + outcome + " | " + playedAt;

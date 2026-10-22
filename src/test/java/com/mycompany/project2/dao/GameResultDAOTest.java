@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.project2.dao;
 
 import static org.junit.Assert.assertEquals;
@@ -8,17 +12,24 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Test;
 
-
+/**
+ * Tests database operations for game results.
+ *
+ * @author poloj
+ * @author nicka
+ */
 public class GameResultDAOTest {
 
     private final GameResultDAO dao = new DerbyGameResultDAO();
     private final String playerName = "TestPlayer" + System.nanoTime();
 
+    // Removes test data after each test
     @After
     public void removeTestResults() {
         dao.deleteByPlayer(playerName);
     }
 
+    // Tests that a saved result can be loaded correctly
     @Test
     public void savedResultCanBeReadBackWithAllFieldsIntact() {
         dao.save(playerName, "WON - test");
@@ -31,9 +42,13 @@ public class GameResultDAOTest {
         assertNotNull(found.get(0).getPlayedAt());
     }
 
+    // Tests that outcome totals are counted correctly
     @Test
     public void outcomeCountsAreCorrect() {
-        String outcome = "TEST OUTCOME " + System.nanoTime(); // unique, so no other row matches
+
+        // Unique outcome so other records will not affect the test
+        String outcome = "TEST OUTCOME " + System.nanoTime();
+
         dao.save(playerName, outcome);
         dao.save(playerName, outcome);
 

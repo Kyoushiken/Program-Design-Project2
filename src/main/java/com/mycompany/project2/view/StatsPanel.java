@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.project2.view;
 
 import com.mycompany.project2.model.Player;
@@ -8,7 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-
+/**
+ *
+ * @author poloj
+ * @author nicka
+ */
 public class StatsPanel extends JPanel {
 
     private static final Color HP_GOOD = new Color(0x4CAF50);
@@ -20,8 +28,11 @@ public class StatsPanel extends JPanel {
     private final JLabel itemsLabel = GameStyle.label(" ");
 
     public StatsPanel() {
+
+        // Set up the stats display
         setOpaque(false);
         setLayout(new FlowLayout(FlowLayout.LEFT, 15, 5));
+
         hpBar.setStringPainted(true);
         hpBar.setPreferredSize(new Dimension(160, 22));
 
@@ -29,21 +40,35 @@ public class StatsPanel extends JPanel {
         add(hpBar);
         add(weaponLabel);
         add(itemsLabel);
+
         refresh(null);
     }
 
+    // Updates the player stats shown on screen
     public void refresh(Player player) {
+
         if (player == null) {
             setVisible(false);
             return;
         }
+
         setVisible(true);
+
         nameLabel.setText(player.getName());
+
         hpBar.setMaximum(player.getMaxHp());
         hpBar.setValue(player.getHp());
         hpBar.setString("HP " + player.getHp() + "/" + player.getMaxHp());
-        hpBar.setForeground(player.getHp() <= player.getMaxHp() / 3 ? HP_LOW : HP_GOOD);
+
+        // Change colour when health is low
+        hpBar.setForeground(
+                player.getHp() <= player.getMaxHp() / 3
+                ? HP_LOW
+                : HP_GOOD);
+
         weaponLabel.setText("Weapon: " + player.getWeapon().getName());
-        itemsLabel.setText("Items: " + String.join(", ", player.getInventory().getItems()));
+        itemsLabel.setText(
+                "Items: "
+                + String.join(", ", player.getInventory().getItems()));
     }
 }
