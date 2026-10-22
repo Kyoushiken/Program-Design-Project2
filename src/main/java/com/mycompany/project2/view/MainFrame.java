@@ -29,6 +29,9 @@ import javax.swing.JTextArea;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): window layout, CardLayout screens,
+// GameListener methods.
 public class MainFrame extends JFrame implements GameListener {
 
     private final GameController controller = new GameController();

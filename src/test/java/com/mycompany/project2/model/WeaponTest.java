@@ -8,11 +8,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
- * Tests the Weapon class behaviour.
  *
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class WeaponTest {
 
     // Tests that weapon damage stays within the valid range

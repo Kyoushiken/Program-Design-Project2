@@ -20,6 +20,7 @@ import javax.swing.UIManager;
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class GameStyle {
 
     static final Color GOLD = new Color(0xC89B3C);

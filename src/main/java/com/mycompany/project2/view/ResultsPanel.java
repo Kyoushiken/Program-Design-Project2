@@ -26,6 +26,8 @@ import javax.swing.table.DefaultTableModel;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): results table, search and Clear history.
 public class ResultsPanel extends JPanel {
 
     private static final String[] COLUMNS = {"Player", "Outcome", "Played at"};

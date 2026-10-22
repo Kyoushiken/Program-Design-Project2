@@ -14,11 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the main game controller functions.
  *
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class GameControllerTest {
 
     private final GameResultDAO resultDAO = new DerbyGameResultDAO();

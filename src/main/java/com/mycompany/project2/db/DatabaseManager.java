@@ -15,6 +15,8 @@ import java.sql.Statement;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): Singleton structure and createTableIfMissing helper.
 public final class DatabaseManager {
 
     private static final String DB_NAME = "project2db";

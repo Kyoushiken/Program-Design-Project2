@@ -23,6 +23,9 @@ import javax.swing.JPanel;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): base ImageIcon version.
+// Title drawing with shadow
 public class ScenePanel extends JPanel {
 
     private static final String TITLE = "TOWN'S LOST RING";

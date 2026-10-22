@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class Main {
 
     // Starts the game application

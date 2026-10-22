@@ -20,6 +20,8 @@ import java.util.Map;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): JDBC methods using PreparedStatement.
 public class DerbyGameResultDAO implements GameResultDAO {
 
     private static final String INSERT_SQL

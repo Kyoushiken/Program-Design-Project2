@@ -23,6 +23,9 @@ import java.util.Map;
  * @author poloj
  * @author nicka
  */
+
+// Generated with assistance from Claude (Anthropic): 
+// game-rule methods, GameListener (Observer) notifications, DAO calls
 public class GameController {
 
     private static final int START_HP = 10;

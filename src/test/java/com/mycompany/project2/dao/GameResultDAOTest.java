@@ -13,11 +13,11 @@ import org.junit.After;
 import org.junit.Test;
 
 /**
- * Tests database operations for game results.
  *
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class GameResultDAOTest {
 
     private final GameResultDAO dao = new DerbyGameResultDAO();

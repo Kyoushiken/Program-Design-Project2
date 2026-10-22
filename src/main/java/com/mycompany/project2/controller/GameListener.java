@@ -11,6 +11,7 @@ import com.mycompany.project2.model.Player;
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public interface GameListener {
 
     /**

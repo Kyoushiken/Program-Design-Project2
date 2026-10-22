@@ -9,11 +9,11 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 
 /**
- * Tests the Entity class behaviour.
  *
  * @author poloj
  * @author nicka
  */
+// Generated with assistance from Claude (Anthropic).
 public class EntityTest {
 
     // Tests that health cannot go below zero
